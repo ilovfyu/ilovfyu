@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ilovfyu · README 预览</title>
+<style>
+  /* 这个文件只是本地预览用的，不会上传到 GitHub 主页（不影响 README 渲染）。
+     A local-only preview harness. It approximates how GitHub renders README.md. */
+  :root{
+    --bg:#ffffff; --fg:#1f2328; --muted:#59636e; --border:#d1d9e0;
+    --link:#0969da; --quote:#59636e; --code-bg:#f6f8fa; --card:#ffffff;
+  }
+  html[data-theme="dark"]{
+    --bg:#0d1117; --fg:#e6edf3; --muted:#9198a1; --border:#3d444d;
+    --link:#4493f8; --quote:#9198a1; --code-bg:#151b23; --card:#0d1117;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,
+         "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .bar{
+    position:sticky; top:0; z-index:9; display:flex; gap:12px; align-items:center;
+    padding:10px 16px; border-bottom:1px solid var(--border);
+    background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(8px);
+    font-size:13px; color:var(--muted);
+  }
+  .bar b{color:var(--fg)}
+  .bar button{
+    margin-left:auto; cursor:pointer; font:inherit; font-size:13px;
+    padding:6px 14px; border-radius:999px; border:1px solid var(--border);
+    background:var(--code-bg); color:var(--fg);
+  }
+  .bar button:hover{border-color:var(--link); color:var(--link)}
+  .wrap{max-width:1012px; margin:0 auto; padding:24px 24px 64px}
+  @media (max-width:560px){ .wrap{padding:16px 14px 48px} }
+
+  h2{
+    font-size:1.5em; font-weight:600; margin:32px 0 16px; padding-bottom:.3em;
+    border-bottom:1px solid var(--border);
+  }
+  h3{font-size:1.15em; font-weight:600; margin:24px 0 8px}
+  p{margin:0 0 16px}
+  a{color:var(--link); text-decoration:none}
+  a:hover{text-decoration:underline}
+  img{max-width:100%; vertical-align:middle}
+  hr{border:0; border-top:1px solid var(--border); margin:24px 0}
+  blockquote{
+    margin:0 0 16px; padding:0 1em; color:var(--quote);
+    border-left:.25em solid var(--border);
+  }
+  blockquote p:last-child{margin-bottom:0}
+  table{border-collapse:collapse; border-spacing:0}
+  td{vertical-align:top}
+  ul{padding-left:2em; margin:0 0 16px}
+  li{margin:.25em 0}
+  code{
+    font:.85em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    background:var(--code-bg); padding:.2em .4em; border-radius:6px;
+  }
+  .center{text-align:center}
+  .divider{display:block; width:100%; margin:28px 0}
+  .sub{color:var(--muted); font-size:12px}
+  .stack img{margin:3px 2px}
+  .note{
+    margin:18px 0; padding:10px 14px; border-radius:8px; font-size:13px;
+    border:1px dashed var(--border); color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span>本地预览 · <b>ilovfyu</b> 主页 README</span>
+  <button id="toggle" type="button">切换暗色 / Toggle dark</button>
+</div>
+
+<div class="wrap">
+
+  <img class="themed" alt="banner" width="100%"
+       data-light="assets/banner-light.svg" data-dark="assets/banner-dark.svg">
+
+  <div class="center">
+    <a href="https://github.com/ilovfyu">
+      <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=20&pause=1300&color=FFB45C&center=true&vCenter=true&width=640&lines=Love+freedom.;Coding+under+the+dusk+sky.;Still+learning.+Still+building."
+           alt="typing tagline">
+    </a>
+    <p>
+      <img src="https://img.shields.io/badge/GitHub-ilovfyu-ff9ec4?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1035" alt="GitHub">
+      <img src="https://komarev.com/ghpvc/?username=ilovfyu&label=VISITORS&color=ff9ec4&style=for-the-badge&labelColor=1a1035" alt="visitors">
+    </p>
+  </div>
+
+  <h2>关于我 · About Me</h2>
+  <div class="center">
+    <img class="themed" width="380" alt="profile card"
+         data-light="assets/card-light.svg" data-dark="assets/card-dark.svg">
+  </div>
+  <p>黄昏是一天里光线最好的时候 —— 天空同时有蓝、紫、橙三种颜色，什么都看得清，又什么都不刺眼。
+  我大概想写出那样的代码。</p>
+  <p><em>Twilight is when the sky holds blue, violet and orange at once — clear, but never harsh.
+  That's roughly the kind of code I want to write.</em></p>
+  <ul>
+    <li><b>在做 / Building</b> — 打磨 <a href="https://github.com/ilovfyu/SkillForge">SkillForge</a></li>
+    <li><b>喜欢 / Likes</b> — 干净的界面、克制的代码、长曝光照片</li>
+    <li><b>在学 / Learning</b> — 把复杂问题讲简单的能力</li>
+    <li><b>信条 / Motto</b> — 把线连起来；代码也是一种「結び」</li>
+  </ul>
+
+  <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
+
+  <h2>足迹 · Contributions</h2>
+  <p>主页上那块热力图、以及右侧的 Contribution activity，是 GitHub 自己的界面，改不了配色。
+  所以我把同一份数据拉下来，用自己的黄昏配色重画了一遍 —— 越活跃，天色越亮。</p>
+  <div class="center">
+    <img class="themed" width="100%" alt="contribution heatmap"
+         data-light="assets/heatmap-light.svg" data-dark="assets/heatmap-dark.svg">
+    <img class="themed" width="100%" style="margin-top:12px" alt="contribution activity"
+         data-light="assets/activity-light.svg" data-dark="assets/activity-dark.svg">
+  </div>
+  <p class="note">↑ 这两张卡由 GitHub Action 每天自动重绘，数据来自 jogruber 的公开 API。
+  手动刷新：<code>python3 tools/build_heatmap.py</code></p>
+
+  <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
+
+  <h2>工具箱 · Toolbox</h2>
+  <div class="center stack">
+    <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white&labelColor=1a1035" alt="Python">
+    <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white&labelColor=1a1035" alt="TypeScript">
+    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black&labelColor=1a1035" alt="JavaScript">
+    <img src="https://img.shields.io/badge/Node.js-5FA04E?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=1a1035" alt="Node.js">
+    <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black&labelColor=1a1035" alt="React">
+    <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white&labelColor=1a1035" alt="Git">
+    <img src="https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black&labelColor=1a1035" alt="Linux">
+    <img src="https://img.shields.io/badge/VS%20Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white&labelColor=1a1035" alt="VS Code">
+  </div>
+
+  <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
+
+  <h2>数据 · Stats</h2>
+  <div class="center">
+    <img height="170" alt="stats"
+         data-light="https://github-readme-stats.vercel.app/api?username=ilovfyu&show_icons=true&hide_border=true&include_all_commits=true&card_width=400&bg_color=fff8ef&title_color=b8326e&text_color=3d3363&icon_color=ff9a5c"
+         data-dark="https://github-readme-stats.vercel.app/api?username=ilovfyu&show_icons=true&hide_border=true&include_all_commits=true&card_width=400&bg_color=1a1035&title_color=ffd166&text_color=e8d9ff&icon_color=ff9ec4"
+         class="themed">
+    <img height="170" alt="langs"
+         data-light="https://github-readme-stats.vercel.app/api/top-langs/?username=ilovfyu&layout=compact&hide_border=true&langs_count=8&card_width=400&bg_color=fff8ef&title_color=b8326e&text_color=3d3363"
+         data-dark="https://github-readme-stats.vercel.app/api/top-langs/?username=ilovfyu&layout=compact&hide_border=true&langs_count=8&card_width=400&bg_color=1a1035&title_color=ffd166&text_color=e8d9ff"
+         class="themed">
+    <p class="note">↑ 这两张卡来自 github-readme-stats（需要联网 + 该服务可用）。仓库太新时可能显示为空。</p>
+    <img alt="streak"
+         data-light="https://streak-stats.demolab.com?user=ilovfyu&hide_border=true&background=fff8ef&border=ffd0b0&stroke=ffd0b0&ring=ff9a5c&fire=b8326e&currStreakLabel=b8326e&sideLabels=3d3363&dates=8a7bb5&currStreakNum=2b2a72&sideNums=2b2a72"
+         data-dark="https://streak-stats.demolab.com?user=ilovfyu&hide_border=true&background=1a1035&border=5b3fa8&stroke=5b3fa8&ring=ffd166&fire=ff9ec4&currStreakLabel=ffd166&sideLabels=e8d9ff&dates=a98fd6&currStreakNum=fff2c2&sideNums=fff2c2"
+         class="themed">
+  </div>
+
+  <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
+
+  <h2>精选 · Featured</h2>
+  <h3><a href="https://github.com/ilovfyu/SkillForge">SkillForge</a></h3>
+  <blockquote><p>一句话说清它解决什么问题 —— 谁在什么场景下会用到它。</p></blockquote>
+  <p>
+    <img src="https://img.shields.io/badge/status-building-ff9ec4?style=flat-square&labelColor=1a1035" alt="status">
+    <img src="https://img.shields.io/badge/license-TBD-5b3fa8?style=flat-square&labelColor=1a1035" alt="license">
+  </p>
+
+  <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
+
+  <h2>一句 · A Line</h2>
+  <blockquote>
+    <p>「結び」—— 把线连起来。把人和人连起来，把今天和明天连起来。<br>
+    写代码也是一种結び：把脑子里的想法，和真实世界里能跑起来的东西连起来。</p>
+    <p><em>Musubi — tying things together. Code is one way of tying an idea to something that actually runs.</em></p>
+  </blockquote>
+
+  <img class="themed" alt="footer" width="100%"
+       data-light="assets/footer-light.svg" data-dark="assets/footer-dark.svg">
+
+  <p class="center sub">用 Markdown、SVG 和黄昏时分的天空手搓 · Hand-built with Markdown, SVG, and a dusk sky</p>
+</div>
+
+<script>
+  // <picture>+prefers-color-scheme 只在真实 GitHub 上生效；本地预览用这个按钮手动切换。
+  var root = document.documentElement, btn = document.getElementById('toggle');
+  function apply(t){
+    root.dataset.theme = t;
+    document.querySelectorAll('.themed').forEach(function(el){
+      var src = el.dataset[t];
+      if (src) el.src = src;
+    });
+    btn.textContent = (t === 'dark') ? '切换亮色 / Toggle light' : '切换暗色 / Toggle dark';
+  }
+  btn.addEventListener('click', function(){
+    apply(root.dataset.theme === 'dark' ? 'light' : 'dark');
+  });
+  // 也支持直接开 file:///.../preview.html#dark
+  apply(location.hash === '#dark' ? 'dark' : 'light');
+</script>
+</body>
+</html>

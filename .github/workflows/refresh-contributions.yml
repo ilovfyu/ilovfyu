@@ -1,0 +1,44 @@
+name: Refresh contribution cards
+
+# 每天重新拉一次贡献数据，重绘 assets/heatmap-*.svg 和 assets/activity-*.svg。
+# 用 GITHUB_TOKEN 提交，不需要你配置任何 secret。
+#
+# 也可以在 Actions 页面手动点 "Run workflow" 立刻刷新。
+
+on:
+  schedule:
+    - cron: "23 2 * * *"      # 每天 UTC 02:23（避开整点，减少排队）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-contribution-cards
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 只用标准库，无需 pip install
+      - name: Rebuild cards
+        run: python3 tools/build_heatmap.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet; then
+            echo "数据没有变化，跳过提交。"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/heatmap-*.svg assets/activity-*.svg data/contributions.json
+          git commit -m "chore: refresh contribution cards [skip ci]"
+          git push

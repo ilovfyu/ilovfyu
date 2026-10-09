@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 340" width="520" height="340" role="img" aria-labelledby="ct cd">
+  <title id="ct">ilovfyu — profile card</title>
+  <desc id="cd">A twilight-themed profile card with name, alias and quick facts.</desc>
+  <defs>
+    <linearGradient id="cBg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="340"><stop offset="0" stop-color="#150c33" stop-opacity="1"/><stop offset="1" stop-color="#251348" stop-opacity="1"/></linearGradient>
+    <linearGradient id="cEdge" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffc477" stop-opacity="0.95"/><stop offset="1" stop-color="#a97bff" stop-opacity="0.85"/></linearGradient>
+    <linearGradient id="nameFill" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff2c2"/><stop offset="1" stop-color="#ff9fc6"/></linearGradient>
+    <linearGradient id="cComet" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a97bff" stop-opacity="0.55"/><stop offset="1" stop-color="#a97bff" stop-opacity="0.0"/></linearGradient>
+    <clipPath id="cclip"><rect x="2" y="2" width="516" height="336" rx="20"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#cclip)">
+    <rect x="2" y="2" width="516" height="336" rx="20" fill="url(#cBg)"/>
+    <polygon points="520,0 330,190 400,190" fill="url(#cComet)" opacity="0.5"/>
+    <circle cx="486" cy="52" r="34" fill="#ffe6a8" opacity="0.16"/>
+    <circle cx="486" cy="52" r="4" fill="#ffe6a8" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;0.3;0.9" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <rect x="2" y="2" width="516" height="336" rx="20" fill="none" stroke="url(#cEdge)" stroke-width="1.6"/>
+
+  <g font-family="'Avenir Next','Futura','Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif">
+    <text x="34" y="66" font-size="34" font-weight="700" letter-spacing="1.5" fill="url(#nameFill)">ilovfyu</text>
+    <text x="34" y="92" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="13" fill="#a98fd6">@ilovfyu-niosle</text>
+    <path d="M34,112 L486,112" stroke="url(#cEdge)" stroke-width="1" opacity="0.75"/>
+    <text x="34" y="150" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="10.5" letter-spacing="2.4" fill="#a98fd6" opacity="0.85">BIO</text>
+    <text x="112" y="150" font-family="'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP','Microsoft YaHei',system-ui,sans-serif" font-size="14.5" fill="#e8d9ff">爱自由.</text>
+    <line x1="34" y1="165" x2="486" y2="165" stroke="#3a2160" stroke-width="1" opacity="0.55"/>
+    <text x="34" y="194" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="10.5" letter-spacing="2.4" fill="#a98fd6" opacity="0.85">MODE</text>
+    <text x="112" y="194" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="14.5" fill="#e8d9ff">coding under the dusk sky</text>
+    <line x1="34" y1="209" x2="486" y2="209" stroke="#3a2160" stroke-width="1" opacity="0.55"/>
+    <text x="34" y="238" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="10.5" letter-spacing="2.4" fill="#a98fd6" opacity="0.85">ALIAS</text>
+    <text x="112" y="238" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="14.5" fill="#e8d9ff">ilovfyu-niosle</text>
+    <line x1="34" y1="253" x2="486" y2="253" stroke="#3a2160" stroke-width="1" opacity="0.55"/>
+    <text x="34" y="282" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="10.5" letter-spacing="2.4" fill="#a98fd6" opacity="0.85">SINCE</text>
+    <text x="112" y="282" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace" font-size="14.5" fill="#e8d9ff">2020.12 · GitHub</text>
+    <line x1="34" y1="297" x2="486" y2="297" stroke="#3a2160" stroke-width="1" opacity="0.55"/>
+  </g>
+</svg>

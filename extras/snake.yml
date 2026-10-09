@@ -1,0 +1,35 @@
+name: Generate contribution snake
+
+# ⚠️ 这是「可选增强」，默认不会生效 —— 因为它在 extras/ 目录里，不在 .github/workflows/。
+#
+# 想要的话：把本文件复制到 .github/workflows/snake.yml 然后提交即可。
+# 它会生成一条在贡献格子上爬的贪吃蛇，配色已经调成黄昏主题，
+# 输出推到 output 分支，README 里用 raw 链接引用。
+#
+# 不想要：什么都不用做，或者删掉 extras/ 目录。
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ilovfyu
+          outputs: |
+            dist/snake-light.svg?palette=github-light&color_snake=%23c8447e&color_dots=%23efe4f2,%23cda9de,%23e07ba8,%23ff9a5c,%23ffc93c
+            dist/snake-dark.svg?palette=github-dark&color_snake=%23ffc06a&color_dots=%23241a42,%234a2a6b,%238e3f7a,%23d9665f,%23ffc06a
+
+      - uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

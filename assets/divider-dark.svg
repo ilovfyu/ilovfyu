@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 56" width="1200" height="56" role="img" aria-label="section divider">
+  <defs>
+    <linearGradient id="divLine" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffc477" stop-opacity="0.0"/><stop offset="0.18" stop-color="#ffc477" stop-opacity="0.75"/><stop offset="0.5" stop-color="#ffe6a8" stop-opacity="1.0"/><stop offset="0.82" stop-color="#ffc477" stop-opacity="0.75"/><stop offset="1" stop-color="#ffc477" stop-opacity="0.0"/></linearGradient>
+    #ffe6a8
+    <filter id="dglow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <path d="M110,30 Q360,12 600,29 Q840,46 1090,26" stroke="url(#divLine)" stroke-width="1.6" fill="none"/>
+  <g filter="url(#dglow)" opacity="0.55">
+    <path d="M600,20 l5,9 l-5,9 l-5,-9 Z" fill="#ffe6a8"/>
+  </g>
+  <path d="M600,20 l5,9 l-5,9 l-5,-9 Z" fill="#ffe6a8">
+    <animate attributeName="opacity" values="0.55;1;0.55" dur="4.5s" repeatCount="indefinite"/>
+  </path>
+  <path d="M368,23 l3,5.5 l-3,5.5 l-3,-5.5 Z" fill="#ffc477" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.25;0.8" dur="3.6s" begin="0.6s" repeatCount="indefinite"/>
+  </path>
+  <path d="M806,27 l3,5.5 l-3,5.5 l-3,-5.5 Z" fill="#ffc477" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.25;0.8" dur="3.9s" begin="1.4s" repeatCount="indefinite"/>
+  </path>
+  <circle cx="210" cy="27" r="1.6" fill="#ffc477" opacity="0.6"/>
+  <circle cx="990" cy="30" r="1.6" fill="#ffc477" opacity="0.6"/>
+</svg>
