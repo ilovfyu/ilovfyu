@@ -80,7 +80,7 @@ open 'preview.html#dark'   # 暗色（或者点右上角按钮切换）
 ├── tools/
 │   ├── build_assets.py        ← 装饰素材生成器（改配色就改这里，离线可用）
 │   ├── build_heatmap.py       ← 贡献卡片生成器（拉数据 + 渲染）
-│   ├── build_projects.py      ← 项目列表卡片生成器（读各仓库的 About 字段）
+│   ├── build_projects.py      ← 项目卡生成器（About 字段 + 语言构成）
 │   └── render.sh              ← 把 SVG 渲染成 PNG，方便自己看效果（仅 macOS 用）
 ├── .github/workflows/
 │   └── refresh-contributions.yml   ← 每天自动刷新上面三张卡
@@ -138,9 +138,40 @@ GitHub 页面上写「28 contributions in the last year」，而我们的卡片�
 | 文件 | 作用 |
 |---|---|
 | `tools/build_heatmap.py` | 拉贡献数据 + 渲染热力图 / 节奏卡 |
-| `tools/build_projects.py` | 读各仓库 About 字段 + 渲染项目列表卡 |
+| `tools/build_projects.py` | 读各仓库 About 字段 + 渲染项目卡（含语言构成条） |
 | `data/contributions.json` | 数据缓存，断网也能重绘 |
 | `.github/workflows/refresh-contributions.yml` | 每天 UTC 02:23 自动重跑并提交 |
+
+### 为什么把第三方统计卡全删了
+
+早期版本里有 `github-readme-stats` 和 `streak-stats` 两张卡。删掉的原因是
+**同一页面上出现了互相矛盾的「提交数」**：
+
+| 来源 | 显示 |
+|---|---|
+| 我的热力图卡 | 23 |
+| GitHub 原生 | 24 |
+| `streak-stats` | 26 |
+| `github-readme-stats` | Total Commits 2 |
+
+四个数字、三种口径，访客无法判断该信哪个。而且 `github-readme-stats` 还会给一个
+「C」等级 —— 一个只有几次提交的账号被评 C，既不准也不好看。
+
+**现在的原则：任何统计数字只有一个出处。** 具体做法：
+
+1. **数据源换成 GitHub 自己的贡献日历**（`github.com/users/<user>/contributions`）。
+   它才是权威来源，数字和主页上那个**逐一对得上**。
+   原来用的第三方 JSON API 会缓存、可能滞后一天，所以才会差 1。
+   第三方 API 现在只作备用（GitHub 页面结构变了就用它兜底）。
+2. **删除 `streak-stats`** —— 连续天数我的「提交节奏」卡里已经有了。
+3. **删除 `github-readme-stats` 主卡** —— 提交数重复，其余是 star / PR / issue（目前都是 0）。
+4. **语言构成改由自己渲染**（`build_projects.py` 里的堆叠色条），
+   替掉第三方的 top-languages 卡，样式和其余卡片完全统一。
+
+结果：**主页上除了徽章、打字机标语和访客计数，没有任何第三方数据卡**，
+所有图形都是仓库里的 SVG。
+
+> 想把某张卡加回来也可以，但加之前先想清楚：它显示的数字会不会和已有卡片打架。
 
 热力图的 5 个等级色在 `tools/build_assets.py` 的 `levels` 里，**越活跃越接近日落色**：
 

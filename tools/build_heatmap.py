@@ -17,7 +17,9 @@ Raw data is cached to data/contributions.json so that:
   · `--offline` can rebuild the SVGs from the last fetch
   · the daily Action's commit shows a readable data diff
 
-Data source: https://github-contributions-api.jogruber.de  (public, no token needed)
+Data source: github.com/users/<user>/contributions  (GitHub's own calendar — primary,
+             so the numbers match the profile page exactly)
+             github-contributions-api.jogruber.de   (fallback; caches, can lag a day)
 
 Usage:
     python3 tools/build_heatmap.py              # fetch, then render
@@ -29,6 +31,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import sys
 import urllib.request
 
@@ -41,6 +44,8 @@ DATA_DIR = os.path.join(ROOT, "data")
 DATA_FILE = os.path.join(DATA_DIR, "contributions.json")
 
 API = "https://github-contributions-api.jogruber.de/v4/{user}?y={years}"
+GH_CONTRIB = "https://github.com/users/{user}/contributions"
+UA = {"User-Agent": "ilovfyu-profile-build", "Accept-Language": "en-US,en;q=0.9"}
 
 # ── layout ────────────────────────────────────────────────────────────────────
 # Cards are designed at 900px wide on purpose: GitHub renders README content in a
@@ -63,10 +68,46 @@ WEEKDAYS = ["", "Mon", "", "Wed", "", "Fri", ""]   # Sunday-first rows
 # ── data ──────────────────────────────────────────────────────────────────────
 
 def fetch(user, years):
+    """Fallback source: clean JSON, but it caches and can lag a day behind."""
     url = API.format(user=user, years=years)
     req = urllib.request.Request(url, headers={"User-Agent": "ilovfyu-profile-build"})
     with urllib.request.urlopen(req, timeout=45) as fh:
         return json.loads(fh.read().decode("utf-8"))
+
+
+def fetch_github(user):
+    """Primary source: GitHub's own contribution calendar.
+
+    Authoritative, so the numbers match the profile page exactly. The third-party
+    JSON API lagged by a day, which made our card say 23 while GitHub said 24 —
+    both visible on the same page, which is worse than having no number at all.
+
+    The calendar is server-rendered as empty <td data-date data-level> cells plus
+    separate <tool-tip for="..."> nodes holding the counts.
+    """
+    req = urllib.request.Request(GH_CONTRIB.format(user=user), headers=UA)
+    html = urllib.request.urlopen(req, timeout=45).read().decode("utf-8", "replace")
+
+    cells = {}
+    for tag in re.findall(r"<td\b[^>]*>", html):
+        d = re.search(r'data-date="(\d{4}-\d{2}-\d{2})"', tag)
+        i = re.search(r'\bid="([^"]+)"', tag)
+        lv = re.search(r'data-level="(\d+)"', tag)
+        if d and i and lv:
+            cells[i.group(1)] = {"date": d.group(1), "level": int(lv.group(1)), "count": 0}
+
+    for ident, text in re.findall(r'<tool-tip\b[^>]*\bfor="([^"]+)"[^>]*>(.*?)</tool-tip>',
+                                  html, re.S):
+        if ident not in cells:
+            continue
+        m = re.match(r"\s*(\d+|No)\s+contribution", text, re.I)
+        if m:
+            cells[ident]["count"] = 0 if m.group(1).lower() == "no" else int(m.group(1))
+
+    days = sorted(cells.values(), key=lambda c: c["date"])
+    if len(days) < 300:
+        raise ValueError("only parsed %d day cells" % len(days))
+    return {"total": {"lastYear": sum(d["count"] for d in days)}, "contributions": days}
 
 
 def normalise(raw):
@@ -459,14 +500,26 @@ def main():
 
     raw = None
     if not args.offline:
-        try:
-            raw = fetch(args.user, args.years)
-            print("fetched %d days from jogruber" % len(raw.get("contributions", [])))
-        except Exception as exc:                      # network hiccup: keep old assets
-            print("fetch failed (%s)" % exc, file=sys.stderr)
+        # GitHub's own calendar first (authoritative); the JSON API only covers
+        # a rolling year, so it is skipped when a specific range was asked for.
+        sources = []
+        if args.years == "last":
+            sources.append(("github.com", lambda: fetch_github(args.user)))
+        sources.append(("jogruber", lambda: fetch(args.user, args.years)))
+
+        for label, fn in sources:
+            try:
+                raw = fn()
+                print("fetched %d days from %s"
+                      % (len(raw.get("contributions", [])), label))
+                break
+            except Exception as exc:
+                print("  %s failed: %s" % (label, exc), file=sys.stderr)
+        if raw is None:
             if not os.path.exists(DATA_FILE):
+                print("no source available and no cache", file=sys.stderr)
                 return 1
-            print("falling back to cached data", file=sys.stderr)
+            print("all sources failed — falling back to cached data", file=sys.stderr)
 
     if raw is None:
         with open(DATA_FILE, encoding="utf-8") as fh:
