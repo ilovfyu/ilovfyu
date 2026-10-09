@@ -316,7 +316,7 @@ def heatmap(theme, days, cols, total):
 
     return """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d" role="img" aria-labelledby="ht hd">
   <title id="ht">贡献热力图</title>
-  <desc id="hd">最近 53 周的提交热力图，共 %d 次提交，活跃 %d 天。</desc>
+  <desc id="hd">最近 53 周的公开提交热力图，共 %d 次公开提交，活跃 %d 天。</desc>
   <defs>
     %s
     %s
@@ -348,7 +348,7 @@ def heatmap(theme, days, cols, total):
         bg_rect,
         edge_rect,
         UI,
-        title_block(pal, "贡献足迹", "CONTRIBUTION GRAPH", "近一年 %d 次提交" % total),
+        title_block(pal, "贡献足迹", "CONTRIBUTION GRAPH", "近一年 %d 次公开提交" % total),
         "".join(months) + weekdays,
         "".join(cells),
         "".join(legend),

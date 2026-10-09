@@ -122,6 +122,7 @@
          data-light="assets/activity-light.svg" data-dark="assets/activity-dark.svg">
   </div>
   <p class="note">↑ 这两张卡由 GitHub Action 每天自动重绘，数据来自 jogruber 的公开 API。
+  <b>只统计公开贡献</b> —— 所以数字会比 GitHub 页面上那个小（那个含私有贡献）。
   手动刷新：<code>python3 tools/build_heatmap.py</code></p>
 
   <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
@@ -159,8 +160,16 @@
 
   <img class="themed divider" alt="" data-light="assets/divider-light.svg" data-dark="assets/divider-dark.svg">
 
-  <h2>精选 · Featured</h2>
-  <h3><a href="https://github.com/ilovfyu/SkillForge">SkillForge</a></h3>
+  <h2>项目 · Projects</h2>
+  <div class="center">
+    <img class="themed" width="100%" alt="projects card"
+         data-light="assets/projects-light.svg" data-dark="assets/projects-dark.svg">
+  </div>
+  <p class="note">↑ 简介、语言、star、更新时间全部读自各仓库的 About 字段，Action 每天自动刷新。
+  仓库没写简介的话，这里就是空的。</p>
+
+  <h3>精选 · Featured</h3>
+  <h4><a href="https://github.com/ilovfyu/SkillForge">SkillForge</a></h4>
   <blockquote><p>一句话说清它解决什么问题 —— 谁在什么场景下会用到它。</p></blockquote>
   <p>
     <img src="https://img.shields.io/badge/status-building-ff9ec4?style=flat-square&labelColor=1a1035" alt="status">

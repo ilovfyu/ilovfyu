@@ -144,9 +144,24 @@ That's roughly the kind of code I want to write.*
   <img src="assets/divider-light.svg" alt="" width="100%">
 </picture>
 
-## 精选 · Featured
+## 项目 · Projects
 
-### [SkillForge](https://github.com/ilovfyu/SkillForge)
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/projects-dark.svg">
+  <img src="assets/projects-light.svg" alt="ilovfyu 的公开仓库列表，含简介、语言、star 与更新时间" width="100%">
+</picture>
+
+</div>
+
+<!-- 这张卡由 tools/build_projects.py 生成，Action 每天自动刷新。
+     简介、语言、star、更新时间都直接读仓库的 About 字段 ——
+     在 GitHub 上把仓库简介补上，下次刷新就会自动出现在这里。 -->
+
+### 精选 · Featured
+
+#### [SkillForge](https://github.com/ilovfyu/SkillForge)
 
 > 一句话说清它解决什么问题 —— 谁在什么场景下会用到它。
 >
@@ -154,7 +169,7 @@ That's roughly the kind of code I want to write.*
 
 <!-- ✏️ TODO 换成真实的项目介绍，然后照这个格式再加 1~2 个仓库：
 
-### [仓库名](https://github.com/ilovfyu/仓库名)
+#### [仓库名](https://github.com/ilovfyu/仓库名)
 
 > 一句话介绍。 / One-line summary.
 

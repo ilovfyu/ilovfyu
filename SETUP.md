@@ -73,15 +73,17 @@ open 'preview.html#dark'   # 暗色（或者点右上角按钮切换）
 │   ├── divider-{light,dark}.svg    章节之间的分隔装饰
 │   ├── footer-{light,dark}.svg     页脚
 │   ├── heatmap-{light,dark}.svg    贡献热力图（★ 每天自动重绘）
-│   └── activity-{light,dark}.svg   提交节奏 + 统计（★ 每天自动重绘）
+│   ├── activity-{light,dark}.svg   提交节奏 + 统计（★ 每天自动重绘）
+│   └── projects-{light,dark}.svg   项目列表（★ 每天自动重绘）
 ├── data/
 │   └── contributions.json     ← 拉下来的原始贡献数据缓存（每天更新）
 ├── tools/
 │   ├── build_assets.py        ← 装饰素材生成器（改配色就改这里，离线可用）
 │   ├── build_heatmap.py       ← 贡献卡片生成器（拉数据 + 渲染）
+│   ├── build_projects.py      ← 项目列表卡片生成器（读各仓库的 About 字段）
 │   └── render.sh              ← 把 SVG 渲染成 PNG，方便自己看效果（仅 macOS 用）
 ├── .github/workflows/
-│   └── refresh-contributions.yml   ← 每天自动刷新上面那两张卡
+│   └── refresh-contributions.yml   ← 每天自动刷新上面三张卡
 ├── extras/                    ← 可选增强，默认不生效，见 extras/README.md
 └── preview.html               ← 本地预览页
 ```
@@ -92,32 +94,51 @@ open 'preview.html#dark'   # 暗色（或者点右上角按钮切换）
 
 ---
 
-## 4. 关于 GitHub 原生的热力图和 Contribution activity
+## 4. README 下面那几块原生区块，到底能不能动
 
-这两块是**绕不过去的**，先说清楚：
+这是最容易被误解的地方。主页从上到下其实是**两个世界**：上面是你的 README（完全可控），
+下面是 GitHub 自己渲染的固定区块（基本不可控）。
 
-| 位置 | 能不能改样式 |
-|---|---|
-| 主页顶部那块绿色格子热力图 | ❌ 完全不行。它是 GitHub 自己渲染的 UI，不读 README、不读 CSS、也不认主题 |
-| 右侧 / 下方的 **Contribution activity** 动态流 | ❌ 改不了样式，但 ✅ **可以整个关掉** |
-| 你自己仓库里的 "Insights → Contributors" 图 | ❌ 同上 |
+| 区块 | 能不能改 | 怎么办 |
+|---|---|---|
+| **Popular repositories**（置顶仓库卡） | ⚠️ 样式改不了，但**内容能改** | 卡片本身是 GitHub 的 UI；但「About 简介」是你填的。**简介为空 = 一张空白卡**，见下面第 5 节 |
+| **绿色格子热力图** | ❌ 完全不行 | 不读 README、不读 CSS、不认主题。只能自己在 README 里重画一张同数据的卡（本项目已做） |
+| **Activity overview**（含 "Contributed to …" 和执行摘要图） | ❌ 样式改不了，✅ **可以关掉** | 主页贡献图**上方** → **Contribution settings** 下拉 → 点 **Activity overview** |
+| **Contribution activity**（按月的时间线 + Show more activity） | ❌ **官方不支持关闭** | 这是个长期未实现的 feature request，见 [community#43304](https://github.com/orgs/community/discussions/43304)。只能接受它 |
+| **Achievements**（成就徽章） | ❌ 不行 | 同上 |
 
-**关掉 Contribution activity 的方法**（官方文档里的路径）：
+**关于 Activity overview**：关掉它能去掉那个绿色雷达图和 "Contributed to …" 列表，
+主页会清爽不少。这是 GitHub 官方文档里写明的路径（见
+[docs](https://docs.github.com/en/account-and-profile/how-tos/contribution-settings/showing-an-overview-of-your-activity-on-your-profile)）。
 
-1. 打开你的主页 → 在贡献图**上方**找到 **Contribution settings** 下拉菜单
-2. 点 **Activity overview** 即可切换显示 / 隐藏
+**关于 Contribution activity 时间线**：查过了，**没有开关**。GitHub 社区里
+"Option to hide only contribution activities in Profile" 这个帖子至今仍是 feature request 状态。
+所以那一大块深色时间线会一直留在主页最下面 —— 我们能做的只是把 README 做得足够好看，
+让人先看到你设计过的部分。
 
-关掉之后主页会清爽很多，顶部是原生热力图，紧接着就是你自定义的横幅和卡片。
+### 数字为什么对不上：你的 28 vs 卡片的 23
+
+GitHub 页面上写「28 contributions in the last year」，而我们的卡片写「23 次公开提交」。
+
+**两个都对**，只是口径不同：
+
+- GitHub 那个数字 **含私有贡献**（你的 Activity overview 里出现了 `RoostBase/RoostAI`，
+  那是个私有仓库）—— 只有你登录后才看得到这部分
+- 公开 API 只能拿到 **公开** 贡献，未登录的访客看到的也是 23
+
+所以卡片上专门标了「**公开提交**」四个字，避免访客觉得数字不对。想让它更接近，
+可以在 **Settings → Public profile → Contributions & Activity** 里调整私有贡献的显示方式。
 
 **想换配色怎么办？** 只能用「自己渲染」的办法 —— 也就是本项目做的：
 把同一份贡献数据从公开 API 拉下来，用自己的配色重画一张 SVG，嵌进 README。
 数据口径和 GitHub 一致（同一天、同一次提交都算），只是颜色是你说了算。
 
-### 自己渲染的这两张卡是怎么工作的
+### 自己渲染的这三张卡是怎么工作的
 
 | 文件 | 作用 |
 |---|---|
-| `tools/build_heatmap.py` | 拉数据 + 渲染两张卡（亮暗共 4 个 SVG） |
+| `tools/build_heatmap.py` | 拉贡献数据 + 渲染热力图 / 节奏卡 |
+| `tools/build_projects.py` | 读各仓库 About 字段 + 渲染项目列表卡 |
 | `data/contributions.json` | 数据缓存，断网也能重绘 |
 | `.github/workflows/refresh-contributions.yml` | 每天 UTC 02:23 自动重跑并提交 |
 
@@ -150,9 +171,45 @@ python3 tools/build_heatmap.py --years all        # 或 2025
 3. **仓库连续 60 天没有任何活动时，GitHub 会自动停掉定时任务。** 这个 workflow 自己会提交，
    所以正常情况下会一直跑；真被停了，去 Actions 页面点一下 Enable 即可。
 
+### 修好那两张空白的置顶仓库卡
+
+你的两个仓库 **About 简介都是空的**，所以主页上的置顶卡看起来像坏了 ——
+`SkillForge` 是一整块空白，`ilovfyu` 只有一个 "Python"。
+
+**这个改起来很快，收益却很大**，因为置顶卡是主页上面积第二大的元素。
+
+改法：打开仓库首页，点右侧 **About** 栏右上角的**齿轮图标**，填：
+
+| 仓库 | Description（可直接复制） | Topics 建议 |
+|---|---|---|
+| `SkillForge` | 把零散的想法锻造成可复用的技能模块 —— 轻量的技能编排与执行框架。 | `python` `cli` `tooling` |
+| `ilovfyu` | 我的 GitHub 主页：黄昏主题、全手写 SVG、每天自动刷新的贡献卡片。 | `profile-readme` `svg` `github-actions` |
+
+> 上面 `SkillForge` 那句是我按名字猜的，**请改成真实的一句**。
+> 一句话说清「谁在什么场景下会用到它」就够，别写成功能清单。
+
+改完之后做两件事：
+
+1. **排列置顶**：主页 → **Customize your pins** → 勾选要展示的仓库并拖成想要的顺序。
+   建议 `SkillForge` 放第一；`ilovfyu`（主页仓库本身）可以放第二，也可以不置顶。
+2. **刷新项目卡**：`tools/build_projects.py` 读的就是这个 About 字段，
+   下次 Action 跑完（或手动 Run workflow 一次）简介就会自动出现在卡片上。
+
+本地想立刻看效果：
+
+```bash
+python3 tools/build_projects.py
+```
+
+简介为空时它会打印警告，明确告诉你哪个仓库还没写：
+
+```
+  ! ilovfyu/SkillForge 没有写 About 简介 —— 首页卡片上会是空的，建议补上
+```
+
 ---
 
-## 4. 改配色 / 改图形
+## 5. 改配色 / 改图形
 
 所有颜色都集中在 `tools/build_assets.py` 顶部的 `P` 字典里，亮暗各一套：
 
