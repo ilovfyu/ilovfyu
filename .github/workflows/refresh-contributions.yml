@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
 
       # 只用标准库，无需 pip install
-      - name: Rebuild contribution cards
+      - name: Rebuild contribution card
         run: python3 tools/build_heatmap.py
 
       - name: Rebuild project list card
@@ -42,6 +42,6 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/heatmap-*.svg assets/activity-*.svg assets/projects-*.svg data/contributions.json
+          git add assets/contributions-*.svg assets/projects-*.svg data/contributions.json
           git commit -m "chore: refresh contribution cards [skip ci]"
           git push

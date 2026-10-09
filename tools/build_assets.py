@@ -79,8 +79,10 @@ P = {
         "birds": "#c9a6ff",
         "birds_op": "0.5",
         # contribution heatmap: 5 levels, "the busier you are, the closer to sunset"
-        "levels": ["#241a42", "#4a2a6b", "#8e3f7a", "#d9665f", "#ffc06a"],
-        "grid_empty": "#1b1236",
+        # level 0 carries ~98% of the cells, so it has to read as a deliberate grid
+        # against the card background rather than disappear into it
+        "levels": ["#2a1d4e", "#4a2a6b", "#8e3f7a", "#d9665f", "#ffc06a"],
+        "grid_empty": "#211640",
     },
     "light": {
         "sky": [

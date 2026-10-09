@@ -47,6 +47,15 @@ python3 tools/build_heatmap.py     # 联网拉最新贡献数据并重绘
 > 选 **Read and write permissions** 然后保存。
 > 新版仓库默认可能是只读，那样 Action 就推不回来。
 
+### 建议按顺序做这三件事
+
+1. **关掉 Activity overview** —— 主页贡献图**上方** → **Contribution settings** 下拉 →
+   点 **Activity overview**。它会去掉那个绿色雷达图和 "Contributed to …" 列表，
+   是主页上**唯一能关掉**的原生区块。（绿色热力图和 Contribution activity 时间线没有开关，
+   只能留着，原因见第 4 章。）
+2. **补仓库 About 简介** —— 让置顶卡和项目卡不再空白，文案见第 4 章末尾。
+3. **手动跑一次 Action** —— 让贡献卡的数字立刻同步。
+
 ---
 
 ## 2. 本地预览
@@ -72,18 +81,17 @@ open 'preview.html#dark'   # 暗色（或者点右上角按钮切换）
 │   ├── card-{light,dark}.svg       简介卡片
 │   ├── divider-{light,dark}.svg    章节之间的分隔装饰
 │   ├── footer-{light,dark}.svg     页脚
-│   ├── heatmap-{light,dark}.svg    贡献热力图（★ 每天自动重绘）
-│   ├── activity-{light,dark}.svg   提交节奏 + 统计（★ 每天自动重绘）
-│   └── projects-{light,dark}.svg   项目列表（★ 每天自动重绘）
+│   ├── contributions-{light,dark}.svg  贡献卡：热力图 + 月度节奏（★ 每天自动重绘）
+│   └── projects-{light,dark}.svg       项目卡 + 语言构成（★ 每天自动重绘）
 ├── data/
 │   └── contributions.json     ← 拉下来的原始贡献数据缓存（每天更新）
 ├── tools/
 │   ├── build_assets.py        ← 装饰素材生成器（改配色就改这里，离线可用）
-│   ├── build_heatmap.py       ← 贡献卡片生成器（拉数据 + 渲染）
+│   ├── build_heatmap.py       ← 贡献卡生成器（拉数据 + 渲染）
 │   ├── build_projects.py      ← 项目卡生成器（About 字段 + 语言构成）
 │   └── render.sh              ← 把 SVG 渲染成 PNG，方便自己看效果（仅 macOS 用）
 ├── .github/workflows/
-│   └── refresh-contributions.yml   ← 每天自动刷新上面三张卡
+│   └── refresh-contributions.yml   ← 每天自动刷新上面两张卡
 ├── extras/                    ← 可选增强，默认不生效，见 extras/README.md
 └── preview.html               ← 本地预览页
 ```
@@ -133,11 +141,11 @@ GitHub 页面上写「28 contributions in the last year」，而我们的卡片�
 把同一份贡献数据从公开 API 拉下来，用自己的配色重画一张 SVG，嵌进 README。
 数据口径和 GitHub 一致（同一天、同一次提交都算），只是颜色是你说了算。
 
-### 自己渲染的这三张卡是怎么工作的
+### 自己渲染的这两张卡是怎么工作的
 
 | 文件 | 作用 |
 |---|---|
-| `tools/build_heatmap.py` | 拉贡献数据 + 渲染热力图 / 节奏卡 |
+| `tools/build_heatmap.py` | 拉贡献数据 + 渲染贡献卡（上半热力图、下半月度节奏） |
 | `tools/build_projects.py` | 读各仓库 About 字段 + 渲染项目卡（含语言构成条） |
 | `data/contributions.json` | 数据缓存，断网也能重绘 |
 | `.github/workflows/refresh-contributions.yml` | 每天 UTC 02:23 自动重跑并提交 |
@@ -292,10 +300,9 @@ https://img.shields.io/badge/<名称>-<色号>?style=flat-square&logo=<图标名
 
 | 服务 | 用途 | 备注 |
 |---|---|---|
-| `github-contributions-api.jogruber.de` | **贡献原始数据**（热力图 / 节奏卡的唯一数据源） | 公开、无需 token。**只在构建时调用一次**，访客看到的 SVG 是仓库里现成的，不依赖它 |
+| `github.com/users/<user>/contributions` | **贡献原始数据（主数据源）** | 就是主页上那个原生日历本身。用它才能保证数字和 GitHub 显示的一致。只在构建时抓一次，访客侧不依赖 |
+| `github-contributions-api.jogruber.de` | 贡献原始数据（**备用**） | 仅在 GitHub 页面结构变化导致解析失败时兜底。它会缓存、可能滞后一天 |
 | `readme-typing-svg.demolab.com` | 打字机效果标语 | 截图里会是空白，因为它从第 0 帧开始动画，实际页面上正常 |
-| `github-readme-stats.vercel.app` | 统计卡 / 语言分布 | 仓库太新时可能显示为空，正常 |
-| `streak-stats.demolab.com` | 连续提交天数 | 同上 |
 | `komarev.com/ghpvc` | 访客计数 | |
 | `img.shields.io` | 各种徽章 | |
 

@@ -86,20 +86,15 @@ That's roughly the kind of code I want to write.*
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/heatmap-dark.svg">
-  <img src="assets/heatmap-light.svg" alt="最近 53 周的公开提交热力图，含五级数值图例" width="100%">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg">
-  <img src="assets/activity-light.svg" alt="最近 12 个月的提交节奏，以及总提交、活跃天数、连续天数统计" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/contributions-dark.svg">
+  <img src="assets/contributions-light.svg" alt="最近 53 周的公开提交热力图（含五级数值图例）与最近 12 个月的提交节奏" width="100%">
 </picture>
 
 </div>
 
-<!-- 上面两张卡由 tools/build_heatmap.py 生成，Action 每天自动刷新。
-     数据源 github-contributions-api.jogruber.de，只统计「公开」贡献 ——
-     所以数字比 GitHub 页面上那个略小（那个含私有贡献）。 -->
+<!-- 这张卡由 tools/build_heatmap.py 生成，Action 每天自动刷新。
+     数据源是 GitHub 自己的贡献日历，所以数字和主页下方那个原生计数完全一致。
+     只统计「公开」贡献，因此比含私有提交的登录视角数字小。 -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/divider-dark.svg">

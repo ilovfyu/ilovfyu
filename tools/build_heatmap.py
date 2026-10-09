@@ -1,25 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Contribution cards for ilovfyu's profile — rendered locally in the dusk theme.
+Contribution card for ilovfyu's profile — rendered locally in the dusk theme.
 
 Why this exists: the contribution graph and the "Contribution activity" feed on
-github.com are GitHub's own UI. No README, CSS or theme can restyle them. The only
-way to get *your* colours onto that data is to render your own card from the raw
-numbers and embed the SVG. That is what this script does.
+github.com are GitHub's own UI, rendered outside the README container. No README,
+CSS or theme can restyle them, and they cannot be removed either. The only way to
+get *your* colours onto that data is to render your own card from the raw numbers
+and embed the SVG. That is what this script does.
 
-It produces, for both `light` and `dark`:
+One card, two halves:
+    top    53-week calendar heatmap + summary + numeric legend
+    bottom 12-month bar rhythm
 
-    assets/heatmap-<theme>.svg    53-week calendar heatmap
-    assets/activity-<theme>.svg   month-by-month bars + streak stats
-
-Raw data is cached to data/contributions.json so that:
-  · `--offline` can rebuild the SVGs from the last fetch
-  · the daily Action's commit shows a readable data diff
+They used to be two separate cards, but both describe the same thing (commits), so
+merging them removed a redundant title row and ~130px of scroll.
 
 Data source: github.com/users/<user>/contributions  (GitHub's own calendar — primary,
              so the numbers match the profile page exactly)
              github-contributions-api.jogruber.de   (fallback; caches, can lag a day)
+
+Raw data is cached to data/contributions.json so that `--offline` can rebuild the
+SVGs and the daily Action's commit shows a readable data diff.
 
 Usage:
     python3 tools/build_heatmap.py              # fetch, then render
@@ -36,7 +38,7 @@ import sys
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_assets import f, grad, vgrad, P, UI, MONO  # noqa: E402
+from build_assets import f, grad, vgrad, radial, P, UI, MONO  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "assets")
@@ -48,17 +50,23 @@ GH_CONTRIB = "https://github.com/users/{user}/contributions"
 UA = {"User-Agent": "ilovfyu-profile-build", "Accept-Language": "en-US,en;q=0.9"}
 
 # ── layout ────────────────────────────────────────────────────────────────────
-# Cards are designed at 900px wide on purpose: GitHub renders README content in a
-# ~880px column, so a 1200px card would be scaled down 27% and the small labels
-# (legend numbers, weekday names) would turn to mush. At 900px it is ~1:1.
+# Designed at 900px wide on purpose: GitHub renders README content in a ~880px
+# column, so a 1200px card would be scaled down 27% and the small labels (legend
+# numbers, weekday names) would turn to mush. At 900px it is ~1:1.
 CARD_W = 900
 CELL = 12
 GAP = 3
 PITCH = CELL + GAP          # column pitch
 LABEL_W = 30                # room for Mon/Wed/Fri labels
 PAD = 32
-HEATMAP_H = 272
-ACTIVITY_H = 282
+
+GRID_Y = 96                 # top of the calendar grid
+GRID_BOTTOM = GRID_Y + 7 * PITCH - GAP
+SUMMARY_Y = 226             # baseline of the summary line
+DIVIDER_Y = 260             # hairline between the two halves
+BAR_BASE = 366.0            # baseline of the monthly bars
+BAR_MAX_H = 74.0
+CARD_H = 412
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -132,7 +140,6 @@ def build_grid(days, weeks=53):
     if not days:
         return [], None
     last = days[-1]["date"]
-    # the Sunday that ends the final column
     end_sun = last + dt.timedelta(days=(6 - last.weekday()) % 7)
     start_sun = end_sun - dt.timedelta(days=weeks * 7 - 1)
     by_date = {d["date"]: d for d in days}
@@ -231,7 +238,7 @@ def monthly(days, n=12):
     return [(k, totals[k]) for k in keys]
 
 
-# ── shared chrome ─────────────────────────────────────────────────────────────
+# ── shared chrome (also used by build_projects.py) ────────────────────────────
 
 def card_frame(theme, pal, h):
     """Rounded panel + gradient border, matching assets/card-*.svg."""
@@ -249,11 +256,11 @@ def title_block(pal, title, title_en, right_label):
     # measured rather than guessed with len().
     title_w = sum(19.0 if ord(c) > 0x2E80 else 9.5 for c in title)
     return (
-        '<text x="%d" y="52" font-family="%s" font-size="19" font-weight="700" '
+        '<text x="%d" y="46" font-family="%s" font-size="19" font-weight="700" '
         'fill="url(#titleFill)">%s</text>'
-        '<text x="%s" y="52" font-family="%s" font-size="12.5" letter-spacing="1.6" '
+        '<text x="%s" y="46" font-family="%s" font-size="12.5" letter-spacing="1.6" '
         'fill="%s" opacity="0.85">%s</text>'
-        '<text x="%d" y="52" text-anchor="end" font-family="%s" font-size="13" '
+        '<text x="%d" y="46" text-anchor="end" font-family="%s" font-size="13" '
         'fill="%s">%s</text>' % (
             PAD, UI, title,
             f(PAD + title_w + 14), MONO, pal["card_muted"], title_en,
@@ -262,76 +269,66 @@ def title_block(pal, title, title_en, right_label):
     )
 
 
-def stat_pills(pal, items, y, h=34):
-    """A row of rounded label/value chips spread evenly across the card."""
-    gap = 14
-    total = CARD_W - PAD * 2
-    w = (total - gap * (len(items) - 1)) / float(len(items))
-    out = []
-    for i, (label, value) in enumerate(items):
-        x = PAD + i * (w + gap)
-        out.append('<rect x="%s" y="%s" width="%s" height="%d" rx="%d" fill="%s" '
-                   'stroke="%s" stroke-width="1" opacity="0.95"/>'
-                   % (f(x), f(y), f(w), h, h // 2, pal["grid_empty"], pal["card_row"]))
-        out.append('<text x="%s" y="%s" font-family="%s" font-size="10.5" letter-spacing="1.8" '
-                   'fill="%s">%s</text>'
-                   % (f(x + 18), f(y + h / 2 + 4), MONO, pal["card_muted"], label))
-        out.append('<text x="%s" y="%s" text-anchor="end" font-family="%s" font-size="14.5" '
-                   'font-weight="700" fill="%s">%s</text>'
-                   % (f(x + w - 18), f(y + h / 2 + 5), UI, pal["card_text"], value))
-    return "".join(out)
+# ── the card ──────────────────────────────────────────────────────────────────
 
-
-# ── heatmap card ──────────────────────────────────────────────────────────────
-
-def heatmap(theme, days, cols, total):
+def contributions(theme, days, cols, total):
     pal = P[theme]
-    bg, edge, bg_rect, edge_rect = card_frame(theme, pal, HEATMAP_H)
+    bg, edge, bg_rect, edge_rect = card_frame(theme, pal, CARD_H)
+
+    # ── 53-week calendar ──────────────────────────────────────────────────────
     grid_w = len(cols) * PITCH - GAP
-    block_x = (CARD_W - (LABEL_W + grid_w)) / 2.0
-    gx = block_x + LABEL_W
-    gy = 96
+    gx = (CARD_W - (LABEL_W + grid_w)) / 2.0 + LABEL_W
 
     cells = []
     for w, col in enumerate(cols):
         for r, day in enumerate(col):
             lv = day["level"]
             fill = pal["grid_empty"] if lv < 0 else pal["levels"][lv]
-            tip = "%s — %d" % (day["date"].isoformat(), day["count"])
             cells.append(
-                '<rect x="%s" y="%s" width="%d" height="%d" rx="3.4" fill="%s">'
-                "<title>%s</title></rect>"
-                % (f(gx + w * PITCH), f(gy + r * PITCH), CELL, CELL, fill, tip)
+                '<rect x="%s" y="%s" width="%d" height="%d" rx="3" fill="%s">'
+                "<title>%s — %d</title></rect>"
+                % (f(gx + w * PITCH), f(GRID_Y + r * PITCH), CELL, CELL, fill,
+                   day["date"].isoformat(), day["count"])
             )
 
-    # month labels: one per column where the month changes
-    months = []
-    last_month = None
+    months, last_month = [], None
     for w, col in enumerate(cols):
         m = col[0]["date"].month
         if m != last_month:
-            months.append(
-                '<text x="%s" y="%s" font-family="%s" font-size="11" fill="%s">%s</text>'
-                % (f(gx + w * PITCH), f(gy - 12), MONO, pal["card_muted"], MONTHS[m - 1])
-            )
+            months.append('<text x="%s" y="%s" font-family="%s" font-size="11" fill="%s">%s</text>'
+                          % (f(gx + w * PITCH), f(GRID_Y - 12), MONO, pal["card_muted"],
+                             MONTHS[m - 1]))
             last_month = m
 
     weekdays = "".join(
         '<text x="%s" y="%s" text-anchor="end" font-family="%s" font-size="10.5" fill="%s">%s</text>'
-        % (f(gx - 10), f(gy + r * PITCH + CELL * 0.78), MONO, pal["card_muted"], WEEKDAYS[r])
+        % (f(gx - 10), f(GRID_Y + r * PITCH + CELL * 0.78), MONO, pal["card_muted"], WEEKDAYS[r])
         for r in range(7) if WEEKDAYS[r]
     )
 
-    # legend — numeric ranges under each swatch (never colour alone)
+    # ── summary line + numeric legend ─────────────────────────────────────────
+    active = sum(1 for d in days if d["count"] > 0)
+    best = max((d["count"] for d in days), default=0)
+    cur, longest = streaks(days)
+    summary = (
+        '<text x="%d" y="%s" font-family="%s" font-size="12" fill="%s" opacity="0.9">'
+        "活跃 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 天"
+        "　·　当前连续 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 天"
+        "　·　最长连续 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 天"
+        "　·　单日最多 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 次</text>"
+        % (PAD, f(SUMMARY_Y), MONO, pal["card_muted"],
+           pal["card_text"], active, pal["card_text"], cur,
+           pal["card_text"], longest, pal["card_text"], best)
+    )
+
     labels = legend_ranges(days)
-    lw = CELL + 13                      # wide enough that "2-3" and "4-6" don't collide
+    lw = CELL + 13
     legend_w = 5 * lw - 13
     lx = CARD_W - PAD - legend_w - 42
-    ly = HEATMAP_H - 52
-    legend = [
-        '<text x="%s" y="%s" text-anchor="end" font-family="%s" font-size="11" fill="%s">少</text>'
-        % (f(lx - 8), f(ly + CELL * 0.82), MONO, pal["card_muted"])
-    ]
+    ly = SUMMARY_Y - 15
+    legend = ['<text x="%s" y="%s" text-anchor="end" font-family="%s" font-size="11" '
+              'fill="%s">少</text>'
+              % (f(lx - 8), f(ly + CELL * 0.82), MONO, pal["card_muted"])]
     for i in range(5):
         x = lx + i * lw
         legend.append('<rect x="%s" y="%s" width="%d" height="%d" rx="3" fill="%s"/>'
@@ -344,121 +341,41 @@ def heatmap(theme, days, cols, total):
     legend.append('<text x="%s" y="%s" font-family="%s" font-size="11" fill="%s">多</text>'
                   % (f(lx + legend_w + 8), f(ly + CELL * 0.82), MONO, pal["card_muted"]))
 
-    active = sum(1 for d in days if d["count"] > 0)
-    best = max((d["count"] for d in days), default=0)
-    cur, longest = streaks(days)
-    summary = ('<text x="%d" y="%s" font-family="%s" font-size="12" fill="%s" opacity="0.9">'
-               "活跃 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 天"
-               "　·　最长连续 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 天"
-               "　·　单日最多 <tspan font-weight=\"700\" fill=\"%s\">%d</tspan> 次</text>"
-               % (PAD, f(ly + CELL * 0.82), MONO, pal["card_muted"],
-                  pal["card_text"], active, pal["card_text"], longest,
-                  pal["card_text"], best))
-
-    return """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d" role="img" aria-labelledby="ht hd">
-  <title id="ht">贡献热力图</title>
-  <desc id="hd">最近 53 周的公开提交热力图，共 %d 次公开提交，活跃 %d 天。</desc>
-  <defs>
-    %s
-    %s
-    %s
-  </defs>
-  %s
-  %s
-  <g font-family="%s">
-    %s
-  </g>
-  <g>
-    %s
-  </g>
-  <g>
-    %s
-  </g>
-  <g>
-    %s
-  </g>
-  <g>
-    %s
-  </g>
-</svg>
-""" % (
-        CARD_W, HEATMAP_H, CARD_W, HEATMAP_H,
-        total, active,
-        bg, edge,
-        grad("titleFill", [(0.0, pal["card_title_a"]), (1.0, pal["card_title_b"])]),
-        bg_rect,
-        edge_rect,
-        UI,
-        title_block(pal, "贡献足迹", "CONTRIBUTION GRAPH", "近一年 %d 次公开提交" % total),
-        "".join(months) + weekdays,
-        "".join(cells),
-        "".join(legend),
-        summary,
-    )
-
-
-# ── activity card ─────────────────────────────────────────────────────────────
-
-def activity(theme, days):
-    pal = P[theme]
-    bg, edge, bg_rect, edge_rect = card_frame(theme, pal, ACTIVITY_H)
-
+    # ── monthly rhythm ────────────────────────────────────────────────────────
     data = monthly(days, 12)
     peak = max([c for _, c in data] + [1])
-    n = len(data)
     bar_w, gap = 46, 24
-    span = n * (bar_w + gap) - gap
+    span = len(data) * (bar_w + gap) - gap
     x0 = (CARD_W - span) / 2.0
-    base = 176.0
-    max_h = 84.0
+    svg_ly = SUMMARY_Y - 15 + CELL + 13   # bottom of the legend numbers
 
     bars = []
     for i, ((y, m), count) in enumerate(data):
         x = x0 + i * (bar_w + gap)
-        hgt = (count / float(peak)) * max_h
-        # empty months still get a visible 3px stub, so the axis reads as intentional
-        hgt = max(hgt, 3.0)
-        top = base - hgt
+        hgt = max((count / float(peak)) * BAR_MAX_H, 3.0)   # empty months keep a stub
+        top = BAR_BASE - hgt
         col = pal["levels"][4] if count and count >= peak * 0.66 else \
               pal["levels"][3] if count and count >= peak * 0.33 else \
               pal["levels"][2] if count else pal["grid_empty"]
-        op = "1" if count else "0.9"
-        bars.append(
-            '<rect x="%s" y="%s" width="%d" height="%s" rx="6" fill="%s" opacity="%s">'
-            "<title>%d-%02d — %d 次</title></rect>"
-            % (f(x), f(top), bar_w, f(hgt), col, op, y, m, count)
-        )
+        bars.append('<rect x="%s" y="%s" width="%d" height="%s" rx="6" fill="%s" '
+                    'opacity="%s"><title>%d-%02d — %d 次</title></rect>'
+                    % (f(x), f(top), bar_w, f(hgt), col, "1" if count else "0.9", y, m, count))
         bars.append('<text x="%s" y="%s" text-anchor="middle" font-family="%s" '
                     'font-size="13" font-weight="700" fill="%s" opacity="%s">%s</text>'
                     % (f(x + bar_w / 2), f(top - 10), UI, pal["card_text"],
                        "1" if count else "0.35", count if count else "·"))
         bars.append('<text x="%s" y="%s" text-anchor="middle" font-family="%s" '
                     'font-size="11" fill="%s">%s</text>'
-                    % (f(x + bar_w / 2), f(base + 22), MONO, pal["card_muted"],
+                    % (f(x + bar_w / 2), f(BAR_BASE + 22), MONO, pal["card_muted"],
                        MONTHS[m - 1]))
+    bars.append('<line x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1.2" '
+                'opacity="0.75"/>'
+                % (f(x0 - 6), f(BAR_BASE + 1), f(x0 + span + 6), f(BAR_BASE + 1),
+                   pal["card_row"]))
 
-    bars.append('<line x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1.2" opacity="0.75"/>'
-                % (f(x0 - 6), f(base + 1), f(x0 + span + 6), f(base + 1), pal["card_row"]))
-
-    cur, longest = streaks(days)
-    active = sum(1 for d in days if d["count"] > 0)
-    total = sum(d["count"] for d in days)
-    best_day = max(days, key=lambda d: d["count"], default=None)
-    best_txt = "%s · %d 次" % (best_day["date"].strftime("%m/%d"), best_day["count"]) if best_day else "—"
-    busiest_month = max(data, key=lambda kv: kv[1]) if data else None
-    bm_txt = "%d 年 %d 月 · %d 次" % (busiest_month[0][0], busiest_month[0][1], busiest_month[1]) \
-        if busiest_month and busiest_month[1] else "—"
-
-    pills = stat_pills(pal, [
-        ("总提交", str(total)),
-        ("活跃天数", "%d 天" % active),
-        ("当前连续", "%d 天" % cur),
-        ("最长连续", "%d 天" % longest),
-    ], y=ACTIVITY_H - 58)
-
-    return """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d" role="img" aria-labelledby="at ad">
-  <title id="at">提交节奏</title>
-  <desc id="ad">最近 12 个月的提交量柱状图，以及总提交、活跃天数、连续天数等统计。最忙的是 %s。</desc>
+    return """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d" role="img" aria-labelledby="ct cd">
+  <title id="ct">贡献</title>
+  <desc id="cd">最近 53 周的公开提交热力图（共 %d 次，活跃 %d 天，最长连续 %d 天），以及最近 12 个月的提交量柱状图。</desc>
   <defs>
     %s
     %s
@@ -475,17 +392,27 @@ def activity(theme, days):
   <g>
     %s
   </g>
+  <g>
+    %s
+  </g>
+  <line x1="%d" y1="%s" x2="%d" y2="%s" stroke="%s" stroke-width="1" opacity="0.7"/>
+  <g>
+    %s
+  </g>
 </svg>
 """ % (
-        CARD_W, ACTIVITY_H, CARD_W, ACTIVITY_H, bm_txt,
+        CARD_W, CARD_H, CARD_W, CARD_H,
+        total, active, longest,
         bg, edge,
         grad("titleFill", [(0.0, pal["card_title_a"]), (1.0, pal["card_title_b"])]),
-        bg_rect,
-        edge_rect,
+        bg_rect, edge_rect,
         UI,
-        title_block(pal, "提交节奏", "CONTRIBUTION ACTIVITY", "近 12 个月　·　单日最多 %s" % best_txt),
+        title_block(pal, "贡献", "CONTRIBUTIONS", "近一年 %d 次公开提交" % total),
+        "".join(months) + weekdays,
+        "".join(cells),
+        summary + "".join(legend),
+        PAD, f(DIVIDER_Y), CARD_W - PAD, f(DIVIDER_Y), pal["card_row"],
         "".join(bars),
-        pills,
     )
 
 
@@ -542,13 +469,11 @@ def main():
         os.makedirs(ASSETS)
 
     for theme in ("light", "dark"):
-        for name, svg in (("heatmap", heatmap(theme, days, cols, total)),
-                          ("activity", activity(theme, days))):
-            path = os.path.join(ASSETS, "%s-%s.svg" % (name, theme))
-            with open(path, "w", encoding="utf-8") as fh:
-                fh.write(svg)
-            print("  %-30s %6.1f KB" % (os.path.relpath(path, ROOT),
-                                        os.path.getsize(path) / 1024.0))
+        path = os.path.join(ASSETS, "contributions-%s.svg" % theme)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(contributions(theme, days, cols, total))
+        print("  %-34s %6.1f KB" % (os.path.relpath(path, ROOT),
+                                    os.path.getsize(path) / 1024.0))
     print("done: %d days, %d contributions, %d active days" %
           (len(days), total, sum(1 for d in days if d["count"] > 0)))
     return 0
