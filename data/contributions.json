@@ -1836,12 +1836,17 @@
    "level": 3
   },
   {
-   "count": 2,
+   "count": 3,
    "date": "2026-10-14",
-   "level": 2
+   "level": 3
+  },
+  {
+   "count": 0,
+   "date": "2026-10-15",
+   "level": 0
   }
  ],
  "total": {
-  "lastYear": 57
+  "lastYear": 58
  }
 }
