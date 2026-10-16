@@ -1831,9 +1831,9 @@
    "level": 4
   },
   {
-   "count": 3,
+   "count": 1,
    "date": "2026-10-13",
-   "level": 3
+   "level": 1
   },
   {
    "count": 3,
@@ -1841,8 +1841,13 @@
    "level": 3
   },
   {
-   "count": 0,
+   "count": 2,
    "date": "2026-10-15",
+   "level": 2
+  },
+  {
+   "count": 0,
+   "date": "2026-10-16",
    "level": 0
   }
  ],
